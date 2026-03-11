@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cxyro Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #9b30ff;
+    --purple-dim: #6a0dad;
+    --purple-bright: #bf7fff;
+    --purple-glow: rgba(155,48,255,0.4);
+    --black: #050508;
+    --dark: #0d0d14;
+    --card: #0f0f1a;
+    --border: rgba(155,48,255,0.25);
+    --text: #e8e0f5;
+    --muted: #7a7090;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ──── NAVBAR ──── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 64px;
+    background: rgba(5,5,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    color: var(--purple);
+    text-shadow: 0 0 20px var(--purple-glow), 0 0 40px var(--purple-glow);
+    text-transform: uppercase;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--purple-bright); }
+
+  .nav-discord {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--purple);
+    color: #fff !important;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 0.85rem !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+    box-shadow: 0 0 14px var(--purple-glow);
+  }
+
+  .nav-discord:hover {
+    background: var(--purple-dim) !important;
+    box-shadow: 0 0 28px var(--purple-glow) !important;
+    color: #fff !important;
+  }
+
+  /* ──── HAMBURGER ──── */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .hamburger:hover { border-color: var(--purple); }
+
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background: var(--purple-bright);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 64px;
+    right: 40px;
+    background: rgba(13,13,20,0.97);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    min-width: 220px;
+    display: none;
+    flex-direction: column;
+    z-index: 800;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  .dropdown-menu.open { display: flex; }
+
+  .dropdown-menu a {
+    color: var(--text);
+    text-decoration: none;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(155,48,255,0.1);
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dropdown-menu a:last-child { border-bottom: none; }
+  .dropdown-menu a:hover { background: rgba(155,48,255,0.08); color: var(--purple-bright); }
+
+  .dropdown-menu a .soon-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    border: 1px solid rgba(155,48,255,0.2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* ──── HERO ──── */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    padding: 80px 20px 40px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 40%, rgba(155,48,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 30% 30% at 20% 80%, rgba(106,13,173,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Grid lines */
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(155,48,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(155,48,255,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--purple-bright);
+    letter-spacing: 4px;
+    border: 1px solid var(--border);
+    padding: 5px 16px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    animation: fadeSlideDown 0.8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 4px;
+    color: var(--text);
+    margin-bottom: 12px;
+    animation: fadeSlideDown 0.9s ease both;
+    animation-delay: 0.1s;
+  }
+
+  .hero-title .highlight {
+    color: var(--purple);
+    text-shadow: 0 0 30px var(--purple-glow), 0 0 60px rgba(155,48,255,0.2);
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 44px;
+    animation: fadeSlideDown 1s ease both;
+    animation-delay: 0.2s;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeSlideDown 1.1s ease both;
+    animation-delay: 0.3s;
+  }
+
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 14px 36px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 0 20px var(--purple-glow);
+  }
+
+  .btn-primary:hover {
+    background: #a940ff;
+    box-shadow: 0 0 36px rgba(155,48,255,0.6);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--purple-bright);
+    border: 1px solid var(--border);
+    padding: 14px 36px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--purple);
+    color: var(--purple);
+    transform: translateY(-2px);
+  }
+
+  /* ──── SECTION SHARED ──── */
+  section { padding: 90px 40px; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--purple);
+    letter-spacing: 4px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .section-title span { color: var(--purple); }
+
+  /* ──── SHOP ──── */
+  #shop { background: var(--dark); position: relative; }
+
+  #shop::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .shop-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 36px 28px;
+    position: relative;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+
+  .shop-card:hover {
+    border-color: var(--purple);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(155,48,255,0.2);
+  }
+
+  .shop-card.featured {
+    border-color: var(--purple);
+    box-shadow: 0 0 30px rgba(155,48,255,0.15);
+  }
+
+  .card-badge {
+    position: absolute;
+    top: -1px; right: 20px;
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    text-transform: uppercase;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(155,48,255,0.12);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .card-method {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--purple-bright);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .card-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--purple);
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 16px;
+  }
+
+  .card-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .card-addr {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: rgba(155,48,255,0.06);
+    border: 1px solid rgba(155,48,255,0.15);
+    padding: 8px 12px;
+    border-radius: 2px;
+    word-break: break-all;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-addr:hover { border-color: var(--purple); color: var(--text); }
+
+  .addr-text { flex: 1; word-break: break-all; }
+
+  .copy-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+  .copy-toast {
+    display: none;
+    font-size: 0.65rem;
+    color: var(--purple-bright);
+    margin-top: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  .copy-toast.show { display: block; }
+
+  .card-btn {
+    display: block;
+    width: 100%;
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .card-btn:hover {
+    background: #a940ff;
+    box-shadow: 0 0 20px rgba(155,48,255,0.5);
+  }
+
+  .card-btn.disabled {
+    background: #2a2235;
+    color: var(--muted);
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+  }
+
+  /* ──── DISCORD ──── */
+  #community {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .discord-card {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 60px 40px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    position: relative;
+  }
+
+  .discord-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 0%, rgba(155,48,255,0.07), transparent);
+    pointer-events: none;
+  }
+
+  .discord-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 16px var(--purple-glow));
+  }
+
+  .discord-card h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .discord-card p {
+    color: var(--muted);
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  /* ──── FOOTER ──── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: 3px;
+  }
+
+  .footer-copy {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ──── ANIMATIONS ──── */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 16px var(--purple-glow); }
+    50%       { box-shadow: 0 0 32px rgba(155,48,255,0.6); }
+  }
+
+  .pulse { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+  /* ──── SCROLLBAR ──── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--purple-dim); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Cxyro<span>Hub</span></div>
+  <div class="nav-links">
+    <a href="https://discord.gg/cxyrohub" target="_blank" class="nav-discord">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Discord
+    </a>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<div class="dropdown-menu" id="dropdownMenu">
+  <a href="#home" onclick="closeMenu()">Home</a>
+  <a href="#shop" onclick="closeMenu()">Source Access</a>
+  <a href="#">Luarmor Deobfuscater <span class="soon-tag">SOON</span></a>
+</div>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-tag">// EST. 2026 — CXYRO NETWORK</div>
+  <h1 class="hero-title"><span class="highlight">Cxyro</span> Hub</h1>
+  <p class="hero-sub">Your premium source marketplace</p>
+  <div class="hero-actions">
+    <a href="#shop" class="btn-primary pulse">Browse Shop</a>
+    <a href="https://discord.gg/cxyrohub" target="_blank" class="btn-outline">Join Discord</a>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="section-header">
+    <span class="section-label">// marketplace</span>
+    <h2 class="section-title">Buy <span>Sources</span></h2>
+  </div>
+
+  <div class="shop-grid">
+
+    <!-- LTC Card -->
+    <div class="shop-card featured">
+      <div class="card-badge">Available</div>
+      <div class="card-icon">◈</div>
+      <div class="card-method">Litecoin · LTC</div>
+      <div class="card-title">Source Access</div>
+      <div class="card-price">$10</div>
+      <p class="card-desc">Pay with Litecoin for instant source access. Send to the address below and confirm in Discord.</p>
+      <div class="card-addr" onclick="copyAddr(this, 'LcNzeg14rR5mtwZBW7Qww7Rfe3GG4WCqxt')">
+        <span class="addr-text">LcNzeg14rR5mtwZBW7Qww7Rfe3GG4WCqxt</span>
+        <span class="copy-icon">⧉</span>
+      </div>
+      <div class="copy-toast" id="toast-ltc">✓ Address copied!</div>
+      <a href="https://discord.gg/cxyrohub" target="_blank" class="card-btn">Pay with LTC</a>
+    </div>
+
+    <!-- Robux Card -->
+    <div class="shop-card featured">
+      <div class="card-badge">Available</div>
+      <div class="card-icon">⬡</div>
+      <div class="card-method">Roblox · Robux</div>
+      <div class="card-title">Source Access</div>
+      <div class="card-price">1,000 R$</div>
+      <p class="card-desc">Pay via Roblox Gamepass for source access. Purchase the gamepass and verify your payment in Discord.</p>
+      <a href="https://www.roblox.com/game-pass/1644721098/Leaks-Access" target="_blank" class="card-btn">Buy Gamepass</a>
+    </div>
+
+    <!-- Placeholder Card -->
+    <div class="shop-card">
+      <div class="card-icon" style="opacity:0.4;">⬦</div>
+      <div class="card-method" style="opacity:0.5;">Coming Soon</div>
+      <div class="card-title" style="opacity:0.5;">???</div>
+      <div class="card-price" style="opacity:0.4; font-size:1.4rem;">TBA</div>
+      <p class="card-desc" style="opacity:0.5;">New payment method coming soon. Join the Discord for updates.</p>
+      <button class="card-btn disabled">Coming Soon</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section id="community">
+  <div class="discord-card">
+    <div class="discord-icon">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="#9b30ff"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+    </div>
+    <h2>Join The Community</h2>
+    <p>Get support, updates, and verify your purchases in our Discord. All transactions are confirmed there.</p>
+    <a href="https://discord.gg/cxyrohub" target="_blank" class="btn-primary">discord.gg/cxyrohub</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CXYRO HUB</div>
+  <div class="footer-copy">© 2026 Cxyro Hub — All rights reserved</div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('dropdownMenu').classList.toggle('open');
+  }
+  function closeMenu() {
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#hamburger') && !e.target.closest('#dropdownMenu')) closeMenu();
+  });
+
+  function copyAddr(el, addr) {
+    navigator.clipboard.writeText(addr).then(() => {
+      const toast = document.getElementById('toast-ltc');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  }
+
+  // Smooth reveal on scroll
+  const cards = document.querySelectorAll('.shop-card, .discord-card');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = 1;
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  cards.forEach((c, i) => {
+    c.style.opacity = 0;
+    c.style.transform = 'translateY(30px)';
+    c.style.transition = `opacity 0.5s ease ${i * 0.1}s, transform 0.5s ease ${i * 0.1}s, border-color 0.25s, box-shadow 0.25s`;
+    obs.observe(c);
+  });
+</script>
+</body>
+</html>
